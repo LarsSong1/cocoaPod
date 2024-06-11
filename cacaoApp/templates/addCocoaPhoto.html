@@ -24,14 +24,55 @@
         {% include "components/header.html" %}
         <main class="h-[calc(100vh-120px)] w-full absolute top-14">
 
-        {% include "components/aside.html" %}
+        <aside id="sidebar"
+            class="w-[60px] lg:w-[240px] h-[calc(100vh-120px)] whitespace-nowrap fixed shadow overflow-x-hidden transition-all duration-500 ease-in-out z-20 lg:block hidden">
+            <div class="flex flex-col justify-between h-full">
+                <ul class="flex flex-col gap-1 mt-2">
+                    <li class="text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        <a href={% url "home-view" %} class="w-full flex items-center py-3" href="#">
+                            <i class="fa-solid fa-house text-center text-[#401409]  px-5"></i>
+                            <span class="whitespace-nowrap pl-1">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        <a href={% url "detect-humidity" %} class="w-full flex items-center py-3" href="#">
+                            <i class="fa-solid fa-droplet text-center text-[#401409]  px-5"></i>
+                            <span class="whitespace-nowrap pl-2">Detectar Humedad</span>
+                        </a>
+                    </li>
+
+                    <li class="text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        <a href={% url "upload-image" %} class="w-full flex items-center py-3" href="#">
+                            <i class="fa-solid fa-image text-center text-[#401409]  px-5"></i>
+                            <span class="whitespace-nowrap pl-1">Capturar Imágenes</span>
+                        </a>
+                    </li>
+
+                    <li class="text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        <a class="w-full flex items-center py-3" href="{% url "fertilizers" %}">
+                            <i class="fa-solid fa-seedling text-center text-[#401409]  px-5"></i>
+                            <span class="whitespace-nowrap pl-1">Fertilizantes</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="flex flex-col gap-1 mt-2">
+                    <li class="text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+                        <a class="w-full flex items-center py-3" href="{% url "logout" %}">
+                            <i class="fa-solid fa-right-from-bracket text-center text-[#401409]  px-5"></i>
+                            <span class="pl-1">Salir</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
         </main> 
         <section class="grid place-content-center h-[100%] w-full overflow-hidden" id="content">
                     <div class="mt-4 z-20 relative">
-                        <form class="relative grid place-content-center" method="post"  enctype="multipart/form-data"> 
+                        <form class="relative flex flex-col justify-center items-center" method="post"  enctype="multipart/form-data"> 
                             <div class="">
                                 <div class="video-wrap">
-                                    <video id="video" playsinline autoplay class="rounded-md  w-[300px] lg:w-[500px] "></video>
+                                    <video id="video" playsinline autoplay class="rounded-md mx-auto w-[250px] lg:w-[500px] "></video>
                                 </div>
                                  
                                 <div class="controller w-full flex justify-center">
@@ -46,7 +87,7 @@
                             <canvas class="mx-auto w-[20px] h-[20px]" id="canvas"></canvas>
                             {% csrf_token %}
                             {{ form | crispy }}
-                            <button id="btnEnviar" onClick="replaceBtn()" type="submit" class="bg-black text-white w-[300px] mx-auto h-[50px] rounded-md">Enviar</button>
+                            <button id="btnEnviar" onClick="replaceBtn()" type="submit" class="bg-black text-white w-[250px] lg:w-[300px] mx-auto h-[50px] rounded-md">Enviar</button>
 
                             <div class="flex justify-center flex-col items-center hidden" id="container-btn">
                                 {% include "components/loader.html" %}
@@ -60,7 +101,15 @@
         </section>
        
     </section>
-   
+   <style>
+    input {
+        width: 80%;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+    }
+   </style>
+ 
      
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
     <script src="https://unpkg.com/create-file-list"></script>

@@ -27,6 +27,7 @@ from django.db.models import Sum
 from pathlib import Path
 from .model_yolo import SingletonModel
 from urllib.error import HTTPError
+import urllib.request
 
 # Create your views here.
 
@@ -449,7 +450,27 @@ def showError(request):
 
 
 # funciones
+
+
+RATE_LIMIT_INTERVAL = 60  # segundos
+MAX_RETRIES = 5
+
+def make_request_with_retries(url, retries=MAX_RETRIES):
+    for attempt in range(retries):
+        try:
+            # Realizar la solicitud aquí
+            response = urllib.request.urlopen(url)
+            return response.read()
+        except HTTPError as e:
+            if e.code == 403 and attempt < retries - 1:
+                print(f"Rate limit exceeded. Waiting before retrying... Attempt {attempt + 1}")
+                time.sleep(RATE_LIMIT_INTERVAL)
+            else:
+                raise
+
 def detectCacaoState(img_path):
+    url = 'https://cocoapod.onrender.com/upload-image/'
+    response = make_request_with_retries(url)
     # Dependencias de Lectura
     # Windows
     # temp = pathlib.PosixPath   

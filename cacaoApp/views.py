@@ -278,14 +278,14 @@ class UploadImage(CreateView):
                 if form.is_valid():
                     mazorcaimage = form.save(commit=False)
                     # mazorcaimage.user_id = request.user
-                    mazorcaimage.user_id = request.user.id
+                    mazorcaimage.user_id = request.user
 
                     try: 
                         imageByIa, mazorcaP, mazorcaM, mazorcaS, detectState = detectCacaoState(mazorcaimage.image) 
                     except HTTPError as e:
                         if e.code == 403:
                             print("Rate limit exceeded. Waiting before retrying...")
-                            time.sleep(60)  # Esperar 60 segundos antes de reintentar
+                            time.sleep(200)  # Esperar 60 segundos antes de reintentar
                             return detectCacaoState(mazorcaimage.image)
                         else:
                             raise

@@ -35,6 +35,7 @@ class SingletonModel:
 
     @staticmethod
     def load_model():
-        model_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')  # Asegura que esta ruta es correcta y accesible
+        base_path = Path(__file__).resolve().parent
+        model_path = base_path / 'model' / 'best.pt'    # Asegura que esta ruta es correcta y accesible
         model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path, force_reload=False, trust_repo=True)
         return model

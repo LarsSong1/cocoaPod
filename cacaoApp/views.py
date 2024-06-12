@@ -462,25 +462,25 @@ def detectCacaoState(img_path):
     # model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
 
 
-        model = SingletonModel()
-        img = Image.open(img_path)
+    model = SingletonModel()
+    img = Image.open(img_path)
 
-        results = model(img)
+    results = model(img)
         # resultados = results.print()
-        results.show()
-        r_img = results.render() # returns a list with the images as np.array
-        img_with_boxes = r_img[0]
+    results.show()
+    r_img = results.render() # returns a list with the images as np.array
+    img_with_boxes = r_img[0]
 
-        new_img = Image.fromarray(img_with_boxes) # returns
+    new_img = Image.fromarray(img_with_boxes) # returns
 
 
-        print(results.pandas().xyxy[0])
+    print(results.pandas().xyxy[0])
         # x0,y0,x1,y1,confi,cla = results.xyxy[0][-1].numpy()
         # print(x0, y0, x1, y1, confi,cla)
-        mazorcas = []
-        for mazorca in results.xyxy[0]:
-            x0, y0, x1, y1, confi, cla = mazorca.numpy()
-            mazorcas.append({
+    mazorcas = []
+    for mazorca in results.xyxy[0]:
+        x0, y0, x1, y1, confi, cla = mazorca.numpy()
+        mazorcas.append({
                 'x0': x0,
                 'y0': y0,
                 'x1': x1,
@@ -490,12 +490,12 @@ def detectCacaoState(img_path):
             })
 
 
-        numMazorcaP = 0
-        numMazorcaM = 0
-        numMazorcaS = 0
-        noDetections = True
+    numMazorcaP = 0
+    numMazorcaM = 0
+    numMazorcaS = 0
+    noDetections = True
 
-        for dataMazorca in mazorcas:
+    for dataMazorca in mazorcas:
             print(dataMazorca['confianza'])
             print(f'clase detectada {dataMazorca["clase"]}')
 

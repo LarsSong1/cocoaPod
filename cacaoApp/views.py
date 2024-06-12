@@ -25,7 +25,7 @@ import random
 import time
 from django.db.models import Sum 
 from pathlib import Path
-from model_yolo import YOLOModel
+from .model_yolo import YOLOModel
 
 # Create your views here.
 

@@ -35,8 +35,8 @@ import urllib.request
 # Puerto Serial
 
 
-# folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
-# model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
+folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
+modelIa = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
 
 
 # # Gestion de Usuarios
@@ -482,7 +482,7 @@ def detectCacaoState(img_path):
     # folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
     # model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
 
-    model = SingletonModel().model
+    model = modelIa
     img = Image.open(img_path)
 
     results = model(img)

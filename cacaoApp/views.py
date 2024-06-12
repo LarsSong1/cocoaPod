@@ -269,8 +269,6 @@ class UploadImage(CreateView):
     template_name = 'addCocoaPhoto.html'
     fields = ["image"]
 
-   
-
 
     def post(self, request, *args, **kwargs):
             if request.method == 'POST':
@@ -331,8 +329,8 @@ class UploadImage(CreateView):
                 
                     # agregar otro campo al formulario de imagen
                     mazorcaimage.save()
-                    
-                    return redirect('user-profile', user_id=request.user.id)
+                    user_now = request.user.id
+                    return redirect('user-profile', user_id=user_now)
             else:       
                 form = ImageUploadForm()
             return render(request, 'addCocoaPhoto.html', {'form': form})
@@ -483,7 +481,6 @@ def detectCacaoState(img_path):
 
     # folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
     # model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
-
 
     model = SingletonModel().model
     img = Image.open(img_path)

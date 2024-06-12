@@ -277,7 +277,9 @@ class UploadImage(CreateView):
                 form = ImageUploadForm(request.POST, request.FILES)
                 if form.is_valid():
                     mazorcaimage = form.save(commit=False)
-                    mazorcaimage.user_id = request.user
+                    # mazorcaimage.user_id = request.user
+                    mazorcaimage.user_id = request.user.id
+
                     try: 
                         imageByIa, mazorcaP, mazorcaM, mazorcaS, detectState = detectCacaoState(mazorcaimage.image) 
                     except HTTPError as e:

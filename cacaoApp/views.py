@@ -26,6 +26,7 @@ import time
 from django.db.models import Sum 
 from pathlib import Path
 from .model_yolo import SingletonModel
+from urllib.error import HTTPError
 
 # Create your views here.
 
@@ -267,60 +268,72 @@ class UploadImage(CreateView):
     template_name = 'addCocoaPhoto.html'
     fields = ["image"]
 
+   
+
+
     def post(self, request, *args, **kwargs):
-        if request.method == 'POST':
-            form = ImageUploadForm(request.POST, request.FILES)
-            if form.is_valid():
-                mazorcaimage = form.save(commit=False)
-                mazorcaimage.user_id = request.user
-                imageByIa, mazorcaP, mazorcaM, mazorcaS, detectState = detectCacaoState(mazorcaimage.image) 
+            if request.method == 'POST':
+                form = ImageUploadForm(request.POST, request.FILES)
+                if form.is_valid():
+                    mazorcaimage = form.save(commit=False)
+                    mazorcaimage.user_id = request.user
+                    try: 
+                        imageByIa, mazorcaP, mazorcaM, mazorcaS, detectState = detectCacaoState(mazorcaimage.image) 
+                    except HTTPError as e:
+                        if e.code == 403:
+                            print("Rate limit exceeded. Waiting before retrying...")
+                            time.sleep(60)  # Esperar 60 segundos antes de reintentar
+                            return detectCacaoState(mazorcaimage.image)
+                        else:
+                            raise
 
 
-                mazorcaimage.numPythophora = mazorcaP
-                mazorcaimage.numMonilia = mazorcaM
-                mazorcaimage.numHealthy = mazorcaS
+                    mazorcaimage.numPythophora = mazorcaP
+                    mazorcaimage.numMonilia = mazorcaM
+                    mazorcaimage.numHealthy = mazorcaS
 
 
-                podCount = PodCount.objects.create()
+                    podCount = PodCount.objects.create()
 
-                # filtrado de Mazorcas
-              
-                if mazorcaP >= 1:
-                    mazorcaimage.mazorcaState += f'{mazorcaP} M. con Pythophora\n'
-                    podCount.pythophoraPod += mazorcaP
-
-                if mazorcaM >= 1:
-                    mazorcaimage.mazorcaState += f'{mazorcaM} M. con Monilia\n'
-                    podCount.moniliaPod += mazorcaM
-
-                if mazorcaS >= 1:
-                    mazorcaimage.mazorcaState += f'{mazorcaS} M. Saludable\n'
-                    podCount.healthyPod += mazorcaS
-
-
-                podCount.save()
-
-                mazorcaimage.podCount_id = podCount
-
-
-                processed_image_path = os.path.join(settings.DETECTION_MEDIA_ROOT, 'mydetect.png')
-                # guarda la imagen analizada
-                imageByIa.save(processed_image_path)
-                processed_image = File(open(processed_image_path, 'rb'))
-                mazorcaimage.imagesDetected.save('mydetect.png', processed_image, save=False)
-                # mazorcaimage.imagesDetected.save()
-
-                # Asignar la nueva imagen procesada al campo de imagen del modelo
-                mazorcaimage.image.name = 'mydetect.png'
-
-               
-                # agregar otro campo al formulario de imagen
-                mazorcaimage.save()
+                    # filtrado de Mazorcas
                 
-                return redirect('user-profile', user_id=request.user.id)
-        else:       
-            form = ImageUploadForm()
-        return render(request, 'addCocoaPhoto.html', {'form': form})
+                    if mazorcaP >= 1:
+                        mazorcaimage.mazorcaState += f'{mazorcaP} M. con Pythophora\n'
+                        podCount.pythophoraPod += mazorcaP
+
+                    if mazorcaM >= 1:
+                        mazorcaimage.mazorcaState += f'{mazorcaM} M. con Monilia\n'
+                        podCount.moniliaPod += mazorcaM
+
+                    if mazorcaS >= 1:
+                        mazorcaimage.mazorcaState += f'{mazorcaS} M. Saludable\n'
+                        podCount.healthyPod += mazorcaS
+
+
+                    podCount.save()
+
+                    mazorcaimage.podCount_id = podCount
+
+
+                    processed_image_path = os.path.join(settings.DETECTION_MEDIA_ROOT, 'mydetect.png')
+                    # guarda la imagen analizada
+                    imageByIa.save(processed_image_path)
+                    processed_image = File(open(processed_image_path, 'rb'))
+                    mazorcaimage.imagesDetected.save('mydetect.png', processed_image, save=False)
+                    # mazorcaimage.imagesDetected.save()
+
+                    # Asignar la nueva imagen procesada al campo de imagen del modelo
+                    mazorcaimage.image.name = 'mydetect.png'
+
+                
+                    # agregar otro campo al formulario de imagen
+                    mazorcaimage.save()
+                    
+                    return redirect('user-profile', user_id=request.user.id)
+            else:       
+                form = ImageUploadForm()
+            return render(request, 'addCocoaPhoto.html', {'form': form})
+   
             
 
 # class EditUploadImage(UpdateView):
@@ -448,58 +461,58 @@ def detectCacaoState(img_path):
     # folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
     # model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
 
-    model = SingletonModel()
-    img = Image.open(img_path)
 
-    results = model(img)
-    # resultados = results.print()
-    results.show()
-    r_img = results.render() # returns a list with the images as np.array
-    img_with_boxes = r_img[0]
+        model = SingletonModel()
+        img = Image.open(img_path)
 
-    new_img = Image.fromarray(img_with_boxes) # returns
+        results = model(img)
+        # resultados = results.print()
+        results.show()
+        r_img = results.render() # returns a list with the images as np.array
+        img_with_boxes = r_img[0]
 
-
-    print(results.pandas().xyxy[0])
-    # x0,y0,x1,y1,confi,cla = results.xyxy[0][-1].numpy()
-    # print(x0, y0, x1, y1, confi,cla)
-    mazorcas = []
-    for mazorca in results.xyxy[0]:
-        x0, y0, x1, y1, confi, cla = mazorca.numpy()
-        mazorcas.append({
-            'x0': x0,
-            'y0': y0,
-            'x1': x1,
-            'y1': y1,
-            'confianza': confi,
-            'clase': cla
-        })
+        new_img = Image.fromarray(img_with_boxes) # returns
 
 
-    numMazorcaP = 0
-    numMazorcaM = 0
-    numMazorcaS = 0
-    noDetections = True
-
-    for dataMazorca in mazorcas:
-        print(dataMazorca['confianza'])
-        print(f'clase detectada {dataMazorca["clase"]}')
-
-        if dataMazorca['clase'] == 0:
-            print('Mazorcas con Pythophora')
-            numMazorcaP += 1
-        if dataMazorca["clase"] == 1:
-            print('Mazorcas con Monilia')
-            numMazorcaM += 1
-        if dataMazorca["clase"] == 2:
-            print('Mazoca Saludables')
-            numMazorcaS += 1
-
-        else: 
-            noDetections = False
+        print(results.pandas().xyxy[0])
+        # x0,y0,x1,y1,confi,cla = results.xyxy[0][-1].numpy()
+        # print(x0, y0, x1, y1, confi,cla)
+        mazorcas = []
+        for mazorca in results.xyxy[0]:
+            x0, y0, x1, y1, confi, cla = mazorca.numpy()
+            mazorcas.append({
+                'x0': x0,
+                'y0': y0,
+                'x1': x1,
+                'y1': y1,
+                'confianza': confi,
+                'clase': cla
+            })
 
 
-    
+        numMazorcaP = 0
+        numMazorcaM = 0
+        numMazorcaS = 0
+        noDetections = True
+
+        for dataMazorca in mazorcas:
+            print(dataMazorca['confianza'])
+            print(f'clase detectada {dataMazorca["clase"]}')
+
+            if dataMazorca['clase'] == 0:
+                print('Mazorcas con Pythophora')
+                numMazorcaP += 1
+            if dataMazorca["clase"] == 1:
+                print('Mazorcas con Monilia')
+                numMazorcaM += 1
+            if dataMazorca["clase"] == 2:
+                print('Mazoca Saludables')
+                numMazorcaS += 1
+
+            else: 
+                noDetections = False
+   
+        
 
 
 

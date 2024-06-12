@@ -24,6 +24,7 @@ import serial
 import random
 import time
 from django.db.models import Sum 
+from pathlib import Path
 
 
 # Create your views here.
@@ -433,11 +434,14 @@ def showError(request):
 # funciones
 def detectCacaoState(img_path):
     # Dependencias de Lectura
-    temp = pathlib.PosixPath   
-    pathlib.PosixPath = pathlib.WindowsPath
+    # Windows
+    # temp = pathlib.PosixPath   
+    # pathlib.PosixPath = pathlib.WindowsPath
+    # folder_path = 'C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt'
 
+    # # Linux Deploy
 
-    folder_path = 'C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt'
+    folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
     model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
     img = Image.open(img_path)
 

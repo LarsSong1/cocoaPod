@@ -33,6 +33,10 @@ from pathlib import Path
 # Puerto Serial
 
 
+folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
+model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
+
+
 # # Gestion de Usuarios
 @login_required
 def homeView(request):
@@ -441,8 +445,8 @@ def detectCacaoState(img_path):
 
     # # Linux Deploy
 
-    folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
-    model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
+    # folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
+    # model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
     img = Image.open(img_path)
 
     results = model(img)

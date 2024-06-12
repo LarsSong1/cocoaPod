@@ -25,7 +25,7 @@ import random
 import time
 from django.db.models import Sum 
 from pathlib import Path
-
+from model_yolo import YOLOModel
 
 # Create your views here.
 
@@ -33,8 +33,8 @@ from pathlib import Path
 # Puerto Serial
 
 
-folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
-model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
+# folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
+# model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
 
 
 # # Gestion de Usuarios
@@ -447,6 +447,8 @@ def detectCacaoState(img_path):
 
     # folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
     # model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
+
+    model = YOLOModel.get_instance().get_model()
     img = Image.open(img_path)
 
     results = model(img)

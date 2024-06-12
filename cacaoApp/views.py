@@ -35,7 +35,7 @@ import urllib.request
 # Puerto Serial
 
 
-folder_path = Path('C:/Users/jairg/Desktop/CacaoAPP/cacaoApp/model/best.pt')
+folder_path = Path('/cacaoApp/model/best.pt')
 modelIa = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
 
 

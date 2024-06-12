@@ -483,7 +483,7 @@ def detectCacaoState(img_path):
     # model = torch.hub.load('ultralytics/yolov5',  'custom' , path=folder_path, force_reload=True)
 
 
-    model = SingletonModel()
+    model = SingletonModel().model
     img = Image.open(img_path)
 
     results = model(img)
